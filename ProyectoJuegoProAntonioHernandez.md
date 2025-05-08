@@ -10,8 +10,13 @@ Este proyecto contará con una base de datos que recoja las estadísticas del ju
 
 
 Pasos:
+
 1- Crear la entrada de usuario.
+
 2- Crear la nave.
+
 3- Hacer que la nave dispare y se mueva.
+
 4- Crear los meteoros.
+
 5- Crear el sistema de puntos y vida.
