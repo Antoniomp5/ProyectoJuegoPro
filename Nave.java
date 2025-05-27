@@ -1,62 +1,55 @@
 package juego;
 
 public class Nave {
-    private int x;  // Coordenada X de la nave
-    private int y;  // Coordenada Y de la nave
+    private int x;
+    private int y;
+    private static final int MIN_POS = 0;
+    private static final int MAX_POS = 9; // Asumiendo un área de juego de 10x10
 
-    // Constructor que inicializa la posición de la nave
-    public Nave(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Nave() {
+        this.x = 5; // Posición inicial en el centro
+        this.y = 5;
     }
 
-    // Mover la nave a la izquierda (disminuir la coordenada X)
-    public void moverIzquierda() {
-        x -= 10;  // Se mueve 10 unidades hacia la izquierda
+    public void moverIzquierda() throws NaveException {
+        if (x <= MIN_POS) {
+            throw new NaveException("La nave no puede moverse más a la izquierda.");
+        }
+        x--;
     }
 
-    // Mover la nave a la derecha (aumentar la coordenada X)
-    public void moverDerecha() {
-        x += 10;  // Se mueve 10 unidades hacia la derecha
+    public void moverDerecha() throws NaveException {
+        if (x >= MAX_POS) {
+            throw new NaveException("La nave no puede moverse más a la derecha.");
+        }
+        x++;
     }
 
-    // Mover la nave hacia arriba (disminuir la coordenada Y)
-    public void moverArriba() {
-        y -= 10;  // Se mueve 10 unidades hacia arriba
+    public void moverArriba() throws NaveException {
+        if (y <= MIN_POS) {
+            throw new NaveException("La nave no puede moverse más arriba.");
+        }
+        y--;
     }
 
-    // Mover la nave hacia abajo (aumentar la coordenada Y)
-    public void moverAbajo() {
-        y += 10;  // Se mueve 10 unidades hacia abajo
+    public void moverAbajo() throws NaveException {
+        if (y >= MAX_POS) {
+            throw new NaveException("La nave no puede moverse más abajo.");
+        }
+        y++;
     }
 
-    // Obtener la posición Y de la nave
-    public int getY() {
-        return y;
-    }
-
-    // Obtener la posición X de la nave
     public int getX() {
         return x;
     }
 
-    // Método para mostrar la posición actual de la nave
-    public void mostrarPosicion() {
-        System.out.println("Posición de la nave: X = " + x + ", Y = " + y);
+    public int getY() {
+        return y;
     }
 
-    public static void main(String[] args) {
-        // Crear una nave en la posición (0, 0)
-        Nave nave = new Nave(0, 0);
-        
-        // Mostrar la posición inicial
-        nave.mostrarPosicion();
-
-        // Mover la nave
-        nave.moverDerecha();
-        nave.moverAbajo();
-
-        // Mostrar la nueva posición
-        nave.mostrarPosicion();
+    @Override
+    public String toString() {
+        return "Nave: (" + x + ", " + y + ")";
     }
 }
+
