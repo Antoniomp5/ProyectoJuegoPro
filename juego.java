@@ -1,9 +1,4 @@
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.ConcurrentModificationException;
-
-public class Juego { 
+public class Juego {
     private static Scanner sc = new Scanner(System.in);
     private static Random rand = new Random();
 
@@ -12,7 +7,7 @@ public class Juego {
             System.out.println("¡Bienvenido al Space Invaders!");
             System.out.println("Introduce tu nombre: ");
             String nombre = sc.nextLine();
-            Jugador jugador = new Jugador(nombre); 
+            Jugador jugador = new Jugador(nombre);
 
             Nave nave = new Nave();
             ArrayList<Meteoro> meteoros = new ArrayList<>();
@@ -39,19 +34,29 @@ public class Juego {
                 System.out.println(jugador);
                 System.out.println(nave);
 
+                System.out.println("Elige una opción:");
+                System.out.println("1. Mover izquierda");
+                System.out.println("2. Mover derecha");
+                System.out.println("3. Mover arriba");
+                System.out.println("4. Mover abajo");
+                System.out.println("5. Disparar");
 
                 int opcion = Integer.parseInt(sc.nextLine());
-                switch (opcion) {
-                    case 1: nave.moverIzquierda(); break;
-                    case 2: nave.moverDerecha(); break;
-                    case 3: nave.moverArriba(); break;
-                    case 4: nave.moverAbajo(); break;
-                    case 5:
-                        jugador.ganarPuntos(100); // Simula que el disparo destruye un meteoro y suma puntos
-                        System.out.println("¡Disparo realizado!");
-                        break;
-                    default:
-                        System.out.println("Opción inválida.");
+                try {
+                    switch (opcion) {
+                        case 1: nave.moverIzquierda(); break;
+                        case 2: nave.moverDerecha(); break;
+                        case 3: nave.moverArriba(); break;
+                        case 4: nave.moverAbajo(); break;
+                        case 5:
+                            jugador.ganarPuntos(100); // Simula que el disparo destruye un meteoro y suma puntos
+                            System.out.println("¡Disparo realizado!");
+                            break;
+                        default:
+                            System.out.println("Opción inválida.");
+                    }
+                } catch (NaveException e) {
+                    System.out.println("Error: " + e.getMessage());
                 }
             }
 
@@ -70,7 +75,7 @@ public class Juego {
             System.out.println("Ha ocurrido un error inesperado: " + e.getMessage());
             e.printStackTrace(); // Mostrar detalles del error para depuración
         } finally {
-            sc.close(); 
+            sc.close();
         }
     }
 }
