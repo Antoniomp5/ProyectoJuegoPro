@@ -1,28 +1,40 @@
+package juego;
+
+import java.util.ArrayList;
+
 public class Juego {
     private static Scanner sc = new Scanner(System.in);
     private static Random rand = new Random();
 
     public static void main(String[] args) {
+        BDManager bd = null;
         try {
             System.out.println("¡Bienvenido al Space Invaders!");
             System.out.println("Introduce tu nombre: ");
             String nombre = sc.nextLine();
+
+            bd = new BDManager();
+
+            int jugadorId = bd.buscarJugador(nombre);
+            if (jugadorId == -1) {
+                jugadorId = bd.crearJugador(nombre);
+                System.out.println("Nuevo jugador creado.");
+            } else {
+                System.out.println("Jugador encontrado.");
+            }
+
             Jugador jugador = new Jugador(nombre);
 
             Nave nave = new Nave();
             ArrayList<Meteoro> meteoros = new ArrayList<>();
 
-            // Bucle principal del juego
             while (!jugador.haGanado() && !jugador.haPerdido()) {
-                // Crear meteoros nuevos
-                if (rand.nextInt(10) < 3) { // Cada ciclo tiene una pequeña probabilidad de generar un meteoro
-                    meteoros.add(new Meteoro(rand.nextInt(10), 0)); // Meteoros en posiciones aleatorias
+                if (rand.nextInt(10) < 3) {
+                    meteoros.add(new Meteoro(rand.nextInt(10), 0));
                 }
 
-                // Mover meteoros, y comprobar si impactan con la nave (esto es solo un ejemplo de lo que puede suceder)
-                for (Meteoro meteoro : new ArrayList<>(meteoros)) { // Crear una copia de la lista para evitar ConcurrentModificationException
+                for (Meteoro meteoro : new ArrayList<>(meteoros)) {
                     meteoro.mover();
-                    // Verificar si meteoro tocó la nave
                     if (meteoro.getX() == nave.getX() && meteoro.getY() == nave.getY()) {
                         jugador.perderVida();
                         meteoros.remove(meteoro);
@@ -30,7 +42,6 @@ public class Juego {
                     }
                 }
 
-                // Mostrar el estado del jugador y la nave
                 System.out.println(jugador);
                 System.out.println(nave);
 
@@ -49,7 +60,7 @@ public class Juego {
                         case 3: nave.moverArriba(); break;
                         case 4: nave.moverAbajo(); break;
                         case 5:
-                            jugador.ganarPuntos(100); // Simula que el disparo destruye un meteoro y suma puntos
+                            jugador.ganarPuntos(100);
                             System.out.println("¡Disparo realizado!");
                             break;
                         default:
@@ -58,13 +69,18 @@ public class Juego {
                 } catch (NaveException e) {
                     System.out.println("Error: " + e.getMessage());
                 }
+
+                // Actualizar estado en BD cada ciclo
+                bd.actualizarJugador(jugadorId, jugador.getPuntos(), jugador.getVidas(),
+                        jugador.haGanado() ? "ganado" : jugador.haPerdido() ? "perdido" : "jugando");
             }
 
-            // Verificar si el jugador ha ganado o perdido
             if (jugador.haGanado()) {
                 System.out.println("¡Felicidades, " + jugador.getNombre() + "! Has ganado.");
+                bd.guardarPartida(jugadorId, jugador.getPuntos(), "ganado");
             } else {
                 System.out.println("¡Lo siento, " + jugador.getNombre() + "! Has perdido.");
+                bd.guardarPartida(jugadorId, jugador.getPuntos(), "perdido");
             }
 
         } catch (NumberFormatException e) {
@@ -73,8 +89,15 @@ public class Juego {
             System.out.println("Error al modificar la lista de meteoros.");
         } catch (Exception e) {
             System.out.println("Ha ocurrido un error inesperado: " + e.getMessage());
-            e.printStackTrace(); // Mostrar detalles del error para depuración
+            e.printStackTrace();
         } finally {
+            if (bd != null) {
+                try {
+                    bd.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
             sc.close();
         }
     }
