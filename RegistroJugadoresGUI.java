@@ -1,4 +1,4 @@
-package juego;
+ 	package juego;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class RegistroJugadoresGUI extends JFrame {
     /**
-	 * 
+	 * Declaramos las variables para la invocación de la interfaz gráfica
 	 */
 	private static final long serialVersionUID = 1L;
 	private JTextField campoNombre, campoPuntuacion;
@@ -23,7 +23,7 @@ public class RegistroJugadoresGUI extends JFrame {
 
         jugadores = new ArrayList<>();
 
-        // Crear componentes
+        // Creación de las componetes
         JLabel labelNombre = new JLabel("Nombre:");
         campoNombre = new JTextField(15);
 
@@ -37,7 +37,7 @@ public class RegistroJugadoresGUI extends JFrame {
         areaJugadores.setEditable(false);
         JScrollPane scroll = new JScrollPane(areaJugadores);
 
-        // Panel de entrada
+        // Panel de entrada para el resgisto
         JPanel panelEntrada = new JPanel();
         panelEntrada.setLayout(new GridLayout(3, 2));
         panelEntrada.add(labelNombre);
@@ -47,7 +47,7 @@ public class RegistroJugadoresGUI extends JFrame {
         panelEntrada.add(botonGuardar);
         panelEntrada.add(botonMostrar);
 
-        // Añadir componentes a la ventana
+        // Añadir componentes a la ventana posibilitando que se pueda añadir registros
         setLayout(new BorderLayout());
         add(panelEntrada, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
@@ -58,6 +58,10 @@ public class RegistroJugadoresGUI extends JFrame {
         // Evento botón Mostrar
         botonMostrar.addActionListener(e -> mostrarJugadores());
     }
+    
+    /**
+   	 * Creación de los voids privados para incluir los textos.
+   	 */
 
     private void guardarJugador() {
         String nombre = campoNombre.getText();
@@ -87,6 +91,9 @@ public class RegistroJugadoresGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al guardar en el archivo.");
         }
     }
+    /**
+   	 * Y para mostrar los guardado en la memoria.
+   	 */
 
     private void mostrarJugadores() {
         areaJugadores.setText("");
@@ -99,6 +106,9 @@ public class RegistroJugadoresGUI extends JFrame {
             areaJugadores.setText("No se pudo leer el archivo.");
         }
     }
+    /**
+   	 * Y la invocación para el main.
+   	 */
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new RegistroJugadoresGUI().setVisible(true));
