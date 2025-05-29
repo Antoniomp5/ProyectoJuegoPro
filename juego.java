@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import javax.swing.SwingUtilities;
 
+
 public class Juego {
     private static Scanner sc = new Scanner(System.in);
     private static Random rand = new Random();
@@ -15,28 +16,42 @@ public class Juego {
     public static void main(String[] args) {
         System.out.println("Selecciona una opción:");
         System.out.println("1. Jugar");
-        System.out.println("2. Registro de jugadores");
+        System.out.println("2. Registro de jugadores (GUI)");
         String opcionInicial = sc.nextLine();
+        
+        /**
+       	 * La invocacion en el main. 
+       	 */
 
         if (opcionInicial.equals("2")) {
             SwingUtilities.invokeLater(() -> new RegistroJugadoresGUI().setVisible(true));
             return;
         }
+        // La invocación de las bases de datos.
+        BDManager bdSQL = null;
+        BDPojoManager bdPOJO = new BDPojoManager();
 
-        BDManager bd = null;
         try {
             System.out.println("¡Bienvenido al Space Invaders!");
             System.out.println("Introduce tu nombre: ");
             String nombre = sc.nextLine();
 
-            bd = new BDManager();
+            bdSQL = new BDManager();
 
-            int jugadorId = bd.buscarJugador(nombre);
+            int jugadorId = bdSQL.buscarJugador(nombre);
             if (jugadorId == -1) {
-                jugadorId = bd.crearJugador(nombre);
-                System.out.println("Nuevo jugador creado.");
+                jugadorId = bdSQL.crearJugador(nombre);
+                System.out.println("Nuevo jugador creado en SQL.");
             } else {
-                System.out.println("Jugador encontrado.");
+                System.out.println("Jugador encontrado en SQL.");
+            }
+
+            int jugadorPojoId = bdPOJO.buscarJugador(nombre);
+            if (jugadorPojoId == -1) {
+                jugadorPojoId = bdPOJO.crearJugador(nombre);
+                System.out.println("Nuevo jugador creado en POJO.");
+            } else {
+                System.out.println("Jugador encontrado en POJO.");
             }
 
             Jugador jugador = new Jugador(nombre);
@@ -60,7 +75,6 @@ public class Juego {
                 System.out.println(jugador);
                 System.out.println(nave);
 
-
                 String entrada = sc.nextLine().trim().toLowerCase();
 
                 try {
@@ -79,7 +93,7 @@ public class Juego {
                             break;
                         case "":
                         case " ":
-                        case "SPACE":
+                        case "space":
                             jugador.ganarPuntos(100);
                             System.out.println("¡Disparo realizado!");
                             break;
@@ -90,16 +104,20 @@ public class Juego {
                     System.out.println("Error: " + e.getMessage());
                 }
 
-                bd.actualizarJugador(jugadorId, jugador.getPuntos(), jugador.getVidas(),
-                        jugador.haGanado() ? "ganado" : jugador.haPerdido() ? "perdido" : "jugando");
+                // Actualización en ambos sistemas
+                String estado = jugador.haGanado() ? "ganado" : jugador.haPerdido() ? "perdido" : "jugando";
+                bdSQL.actualizarJugador(jugadorId, jugador.getPuntos(), jugador.getVidas(), estado);
+                bdPOJO.actualizarJugador(jugadorPojoId, jugador.getPuntos(), jugador.getVidas(), estado);
             }
 
             if (jugador.haGanado()) {
                 System.out.println("¡Felicidades, " + jugador.getNombre() + "! Has ganado.");
-                bd.guardarPartida(jugadorId, jugador.getPuntos(), "ganado");
+                bdSQL.guardarPartida(jugadorId, jugador.getPuntos(), "ganado");
+                bdPOJO.guardarPartida(jugadorPojoId, jugador.getPuntos(), "ganado");
             } else {
                 System.out.println("¡Lo siento, " + jugador.getNombre() + "! Has perdido.");
-                bd.guardarPartida(jugadorId, jugador.getPuntos(), "perdido");
+                bdSQL.guardarPartida(jugadorId, jugador.getPuntos(), "perdido");
+                bdPOJO.guardarPartida(jugadorPojoId, jugador.getPuntos(), "perdido");
             }
 
         } catch (NumberFormatException e) {
@@ -110,9 +128,9 @@ public class Juego {
             System.out.println("Ha ocurrido un error inesperado: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            if (bd != null) {
+            if (bdSQL != null) {
                 try {
-                    bd.close();
+                    bdSQL.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
