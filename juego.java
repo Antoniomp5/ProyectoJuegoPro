@@ -1,12 +1,28 @@
 package juego;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Random;
+import java.util.Scanner;
+
+import javax.swing.SwingUtilities;
 
 public class Juego {
     private static Scanner sc = new Scanner(System.in);
     private static Random rand = new Random();
 
     public static void main(String[] args) {
+        System.out.println("Selecciona una opción:");
+        System.out.println("1. Jugar");
+        System.out.println("2. Registro de jugadores");
+        String opcionInicial = sc.nextLine();
+
+        if (opcionInicial.equals("2")) {
+            SwingUtilities.invokeLater(() -> new RegistroJugadoresGUI().setVisible(true));
+            return;
+        }
+
         BDManager bd = null;
         try {
             System.out.println("¡Bienvenido al Space Invaders!");
@@ -24,7 +40,6 @@ public class Juego {
             }
 
             Jugador jugador = new Jugador(nombre);
-
             Nave nave = new Nave();
             ArrayList<Meteoro> meteoros = new ArrayList<>();
 
@@ -45,21 +60,26 @@ public class Juego {
                 System.out.println(jugador);
                 System.out.println(nave);
 
-                System.out.println("Elige una opción:");
-                System.out.println("1. Mover izquierda");
-                System.out.println("2. Mover derecha");
-                System.out.println("3. Mover arriba");
-                System.out.println("4. Mover abajo");
-                System.out.println("5. Disparar");
 
-                int opcion = Integer.parseInt(sc.nextLine());
+                String entrada = sc.nextLine().trim().toLowerCase();
+
                 try {
-                    switch (opcion) {
-                        case 1: nave.moverIzquierda(); break;
-                        case 2: nave.moverDerecha(); break;
-                        case 3: nave.moverArriba(); break;
-                        case 4: nave.moverAbajo(); break;
-                        case 5:
+                    switch (entrada) {
+                        case "a":
+                            nave.moverIzquierda();
+                            break;
+                        case "d":
+                            nave.moverDerecha();
+                            break;
+                        case "w":
+                            nave.moverArriba();
+                            break;
+                        case "s":
+                            nave.moverAbajo();
+                            break;
+                        case "":
+                        case " ":
+                        case "SPACE":
                             jugador.ganarPuntos(100);
                             System.out.println("¡Disparo realizado!");
                             break;
@@ -70,7 +90,6 @@ public class Juego {
                     System.out.println("Error: " + e.getMessage());
                 }
 
-                // Actualizar estado en BD cada ciclo
                 bd.actualizarJugador(jugadorId, jugador.getPuntos(), jugador.getVidas(),
                         jugador.haGanado() ? "ganado" : jugador.haPerdido() ? "perdido" : "jugando");
             }
